@@ -1,6 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissioinsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
+
+
+def upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return '/'.join(['image'], str(instance.userPro.id)+str(instance.nickname)+str('.')+str(ext))
 
 
 class UserManager(BaseUserManager):
@@ -25,7 +30,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissioinsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
@@ -37,3 +42,46 @@ class User(AbstractBaseUser, PermissioinsMixin):
 
     def __str__(self):
         return self.email
+
+
+class Profile(models.Model):
+    nickname = models.CharField(max_length=20)
+    userPro = models.OneToOneField(
+        settings.AUTH_USER_MODEL, related_name='userPro',
+        on_delete=models.CASCADE
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+    img = models.ImageField(blank=True, null=True, upload_to=upload_path)
+
+    def __str__(self):
+        return self.nickname
+
+
+class FriendRequest(models.Model):
+    askFrom = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='askFrom',
+        on_delete=models.CASCADE
+    )
+    askTo = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='askTo',
+        on_delete=models.CASCADE
+    )
+    approved = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (('askFrom', 'askTo'))
+
+    def __str__(self):
+        return str(self.askFrom) + '------>' + str(self.askTo)
+
+
+class Message(models.Model):
+    message = models.CharField(max_length=140)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='sender',
+        on_delete=models.CASCADE
+    )
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='receiver',
+        on_delete=models.CASCADE
+    )
