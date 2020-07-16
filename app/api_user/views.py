@@ -42,10 +42,10 @@ class ProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (
         permissions.IsAuthenticated,
-        custompermissions.ProrfilePermission
+        custompermissions.ProfilePermission
     )
 
-    def perform_create(self):
+    def perform_create(self, serializer):
         serializer.save(userPro=self.request.user)
 
 
