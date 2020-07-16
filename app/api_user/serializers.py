@@ -1,14 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from code.models import Profile, FriendRequest
+from core.models import Profile, FriendRequest
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ('id', 'email', 'password',)
+        extra_kwargs = {'password': {'write_only': True}, }
 
     def create(self, validated_data):
         user = get_user_model().objects.create_user(**validated_data)
@@ -22,12 +22,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'nickname', 'userPro', 'created_on', 'img')
-        extra_kwargs = {'userPro': {'read_only': True}}
+        fields = ('id', 'nickname', 'userPro', 'created_on', 'img',)
+        extra_kwargs = {'userPro': {'read_only': True}, }
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = ('id', 'askFrom', 'askTo', 'approved')
-        extra_kwargs = {'askFrom': {'read_only': True}}
+        extra_kwargs = {'askFrom': {'read_only': True}, }
