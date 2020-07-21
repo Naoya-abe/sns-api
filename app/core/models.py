@@ -5,7 +5,7 @@ from django.conf import settings
 
 def upload_path(instance, filename):
     ext = filename.split('.')[-1]
-    return '/'.join(['image', str(instance.userPro.id)+str(instance.nickname)+str('.')+str(ext)])
+    return '/'.join(['image', str(instance.userPro.id)+str(instance.nickname)+str(".")+str(ext)])
 
 
 class UserManager(BaseUserManager):
@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
 
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError('email is must')
 
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
@@ -69,13 +69,14 @@ class FriendRequest(models.Model):
     approved = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = (('askFrom', 'askTo'))
+        unique_together = (('askFrom', 'askTo'),)
 
     def __str__(self):
-        return str(self.askFrom) + '------>' + str(self.askTo)
+        return str(self.askFrom) + '----->' + str(self.askTo)
 
 
 class Message(models.Model):
+
     message = models.CharField(max_length=140)
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='sender',
@@ -85,3 +86,6 @@ class Message(models.Model):
         settings.AUTH_USER_MODEL, related_name='receiver',
         on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return str(self.sender)
